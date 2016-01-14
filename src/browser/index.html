@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>AT tests</title>
+    <style>
+        textarea {
+            display: block;
+            width: 100%;
+            height: 150px;
+        }
+        input {
+            width: 300px;
+        }
+    </style>
+    <script type="text/javascript" src="robot.js"></script>
+</head>
+<body>
+    <h1>vbox-robot sample page</h1>
+
+    <label>Result: <br><textarea id="result-area"></textarea></label>
+    <script type="text/javascript">
+        var commonCallback = function (result) {
+            document.getElementById("result-area").value = JSON.stringify(result, null, " ");
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.getOffset(callback)</code></h3>
+    <p><button id="getOffset-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("getOffset-execute").onclick = function () {
+            SeleniumJavaRobot.getOffset(commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.mouseMove(x, y, callback)</code></h3>
+    <ul>
+        <li><label>x = <input id="mouseMove-x" value="0"></label></li>
+        <li><label>y = <input id="mouseMove-y" value="0"></label></li>
+    </ul>
+    <p><button id="mouseMove-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("mouseMove-execute").onclick = function () {
+            var x = parseFloat(document.getElementById("mouseMove-x").value);
+            var y = parseFloat(document.getElementById("mouseMove-y").value);
+            SeleniumJavaRobot.mouseMove(x, y, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.smoothMouseMove(fromX, fromY, toX, toY, duration, callback)</code></h3>
+    <ul>
+        <li><label>fromX = <input id="smoothMouseMove-fromX" value="0"></label></li>
+        <li><label>fromY = <input id="smoothMouseMove-fromY" value="0"></label></li>
+        <li><label>toX = <input id="smoothMouseMove-toX" value="500"></label></li>
+        <li><label>toY = <input id="smoothMouseMove-toY" value="500"></label></li>
+        <li><label>duration = <input id="smoothMouseMove-duration" value="5000"></label></li>
+    </ul>
+    <p><button id="smoothMouseMove-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("smoothMouseMove-execute").onclick = function () {
+            var fromX = parseFloat(document.getElementById("smoothMouseMove-fromX").value);
+            var fromY = parseFloat(document.getElementById("smoothMouseMove-fromY").value);
+            var toX = parseFloat(document.getElementById("smoothMouseMove-toX").value);
+            var toY = parseFloat(document.getElementById("smoothMouseMove-toY").value);
+            var duration = parseFloat(document.getElementById("smoothMouseMove-duration").value);
+            SeleniumJavaRobot.smoothMouseMove(fromX, fromY, toX, toY, duration, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.mouseWheel(amount, callback)</code></h3>
+    <ul>
+        <li><label>amount = <input id="mouseWheel-amount" value="1"></label></li>
+    </ul>
+    <p><button id="mouseWheel-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("mouseWheel-execute").onclick = function () {
+            var amount = parseInt(document.getElementById("mouseWheel-amount").value);
+            SeleniumJavaRobot.mouseWheel(amount, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.mousePress(button, callback)</code></h3>
+    <ul>
+        <li><label>button = <input id="mousePress-button" value="16"></label></li>
+    </ul>
+    <p><button id="mousePress-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("mousePress-execute").onclick = function () {
+            var button = parseInt(document.getElementById("mousePress-button").value);
+            SeleniumJavaRobot.mousePress(button, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.mouseRelease(button, callback)</code></h3>
+    <ul>
+        <li><label>button = <input id="mouseRelease-button" value="16"></label></li>
+    </ul>
+    <p><button id="mouseRelease-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("mouseRelease-execute").onclick = function () {
+            var button = parseInt(document.getElementById("mouseRelease-button").value);
+            SeleniumJavaRobot.mouseRelease(button, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.type(text, callback)</code></h3>
+    <ul>
+        <li><label>text = <input id="type-text"></label></li>
+    </ul>
+    <p><button id="type-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("type-execute").onclick = function () {
+            var text = document.getElementById("type-text").value;
+            document.getElementById("keyboard-zone").focus();
+            SeleniumJavaRobot.type(text, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.keyPress(keyCode, callback)</code></h3>
+    <ul>
+        <li><label>keyCode = <input id="keyPress-keyCode" value="65"></label></li>
+    </ul>
+    <p><button id="keyPress-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("keyPress-execute").onclick = function () {
+            var keyCode = document.getElementById("keyPress-keyCode").value;
+            document.getElementById("keyboard-zone").focus();
+            SeleniumJavaRobot.keyPress(keyCode, commonCallback);
+        };
+    </script>
+
+
+    <h3><code>SeleniumJavaRobot.keyRelease(keyCode, callback)</code></h3>
+    <ul>
+        <li><label>keyCode = <input id="keyRelease-keyCode" value="65"></label></li>
+    </ul>
+    <p><button id="keyRelease-execute">Execute</button></p>
+
+    <script type="text/javascript">
+        document.getElementById("keyRelease-execute").onclick = function () {
+            var keyCode = document.getElementById("keyRelease-keyCode").value;
+            document.getElementById("keyboard-zone").focus();
+            SeleniumJavaRobot.keyRelease(keyCode, commonCallback);
+        };
+    </script>
+
+    <br><br><br>
+    <label>Keyboard zone: <br><textarea id="keyboard-zone"></textarea></label>
+</body>
+</html>

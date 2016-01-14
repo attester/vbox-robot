@@ -1,0 +1,43 @@
+{
+  "name": "vbox-robot",
+  "version": "0.0.1",
+  "description": "Tool allowing JavaScripts scripts running in a browser to send keyboard and mouse events to the Virtual Box machine they run in, especially for automated tests.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/attester/vbox-robot.git"
+  },
+  "index": "index.js",
+  "bin": {
+    "vbox-robot": "vbox-robot"
+  },
+  "author": "ariatemplates <contact@ariatemplates.com> (http://github.com/ariatemplates)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/attester/vbox-robot/issues"
+  },
+  "homepage": "https://github.com/attester/vbox-robot",
+  "dependencies": {
+    "basic-auth": "^1.0.3",
+    "co": "^4.6.0",
+    "co-body": "^4.0.0",
+    "koa": "^2.0.0-alpha.3",
+    "koa-router": "^7.0.0",
+    "minimist": "^1.2.0",
+    "pify": "^2.3.0",
+    "pngjs": "^2.1.0",
+    "soap": "^0.11.0",
+    "virtualbox-soap": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=4.2.1"
+  },
+  "scripts": {
+    "prepublish": "webpack",
+    "lint": "eslint src",
+    "test": "npm run lint"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "webpack": "^1.12.9"
+  }
+}

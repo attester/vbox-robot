@@ -1,0 +1,10 @@
+rules:
+  no-var:
+    - 0
+  no-console:
+    - 2
+  prefer-template:
+    - 0
+env:
+  browser: true
+  es6: false

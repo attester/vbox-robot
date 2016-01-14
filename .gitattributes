@@ -1,0 +1,7 @@
+*        text=auto
+
+*.js     text
+*.json   text
+*.yaml   text
+*.md     text
+/bin/vbox-robot   eol=lf
