@@ -147,8 +147,8 @@ The script tag creates a JavaScript global object called `SeleniumJavaRobot`.
 (This name is used for compatibility with the [Selenium Java Robot](https://github.com/attester/selenium-java-robot))
 This object contains some methods which can be called to simulate keyboard and mouse events in the corresponding virtual machine.
 
-If you remove `/robot.js` at the end of the URL, you get the URL of a page where you can play with the different commands of
-the JavaScript API.
+If you remove `/robot.js` at the end of the robot.js URL, you get the URL of a web page that you can open in a web browser in
+the virtual machine, which allows you to play with the different commands of the JavaScript API.
 
 ### Callback
 

@@ -24,8 +24,8 @@ Usage:
 Accepted options:
   --host <hostname>                   Host to bind the web server to.
   --port <port>                       Port to bind the web server to.
-  --username <username>               Username to protect the root url (with basic authentication).
-  --password <password>               Password to protect the root url (with basic authentication).
+  --username <username>               Username to protect the root URL (with basic authentication).
+  --password <password>               Password to protect the root URL (with basic authentication).
   --vboxwebsrv <vboxwebsrv>           URL of the VBoxWebSrv server.
   --vboxusername <username>           Username to connect to the VBoxWebSrv server.
   --vboxpassword <password>           Password to connect to the VBoxWebSrv server.
