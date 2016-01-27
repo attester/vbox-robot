@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Amadeus s.a.s.
+ * Copyright 2016 Amadeus s.a.s.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,40 +15,98 @@
 "use strict";
 
 const path = require("path");
+const child_process = require("child_process");
 const co = require("co");
-const promisify = require("pify");
-const writeFile = promisify(require("fs").writeFile);
-const PNG = require("pngjs").PNG;
-const findRectangle = require("./findRectangle");
 const checkInt = require("../checkInt");
 const createId = require("../createId");
 
+const processes = [];
+const availableProcesses = [];
+
+const childProcessModulePath = path.join(__dirname, "processMain.js");
+
+const createProcess = function () {
+    let curProcess = child_process.fork(childProcessModulePath);
+    processes.push(curProcess);
+    console.log(`[${curProcess.pid}] New child process created (total child processes: ${processes.length})`);
+    let curTaskResolve;
+    let curTaskReject;
+    const res = {
+        executeTask: function (task) {
+            return new Promise((resolve, reject) => {
+                if (curTaskResolve || curTaskReject) {
+                    return reject(new Error("A task is already running in the selected process."));
+                }
+                curTaskResolve = resolve;
+                curTaskReject = reject;
+                curProcess.send(task);
+            });
+        }
+    };
+    const removeProcess = function() {
+        if (!curProcess) {
+            return;
+        }
+        console.log(`[${curProcess.pid}] child process disconnected (remaining child processes: ${processes.length - 1})`);
+        curProcess = null;
+        let index = processes.indexOf(res);
+        if (index > -1) {
+            processes.splice(index, 1);
+        }
+        index = availableProcesses.indexOf(res);
+        if (index > -1) {
+            availableProcesses.splice(index, 1);
+        }
+        const reject = curTaskReject;
+        curTaskReject = null;
+        curTaskResolve = null;
+        if (reject) {
+            reject(new Error("The task terminated unexpectedly."));
+        }
+    };
+    curProcess.on("exit", removeProcess);
+    curProcess.on("disconnect", removeProcess);
+    curProcess.on("message", function (response) {
+        const resolve = curTaskResolve;
+        curTaskResolve = curTaskReject = null;
+        if (resolve) {
+            resolve(response);
+        }
+    });
+    return res;
+};
+
+const executeTask = co.wrap(function *(task) {
+    let curProcess = availableProcesses.pop();
+    if (!curProcess) {
+        curProcess = createProcess();
+    }
+    const response = yield curProcess.executeTask(task);
+    availableProcesses.push(curProcess);
+    if (response.success) {
+        return response.result;
+    } else {
+        throw new Error(response.result);
+    }
+});
+
 module.exports = co.wrap(function *(ctx){
-    const expectedWidth = checkInt(ctx.data[0]);
-    const expectedHeight = checkInt(ctx.data[1]);
+    const config = ctx.application.config;
+    const screenshotsFolder = config["failed-calibrations-folder"];
     const vm = ctx.vm;
+    const task = {
+        expectedWidth: checkInt(ctx.data[0]),
+        expectedHeight: checkInt(ctx.data[1]),
+        failedCalibrationFileName: screenshotsFolder ? path.join(screenshotsFolder, `${createId()}.png`) : null,
+        vboxServer: config.vboxwebsrv,
+        vboxDisplay: vm.vboxDisplay.__object
+    };
+
     // resets the mouse:
     vm.mouseButtonsState = 0;
     yield vm.mouseMove(0, 0);
-    const resolution = yield vm.vboxDisplay.getScreenResolution(0);
-    const screenShot = yield vm.vboxDisplay.takeScreenShotToArray(0, resolution.width, resolution.height, "PNG");
-    const image = new PNG();
-    const parseImage = promisify(image.parse.bind(image));
-    const imageBuffer = new Buffer(screenShot, "base64");
-    yield parseImage(imageBuffer);
-    const rectangle = findRectangle(image, [255,0,0,255], expectedWidth, expectedHeight, 50);
-    if (!rectangle) {
-        const screenshotsFolder = ctx.application.config["failed-calibrations-folder"];
-        if (screenshotsFolder) {
-            const fileName = path.join(screenshotsFolder, `${createId()}.png`);
-            writeFile(fileName, imageBuffer); // no yield to speed up the response
-            throw new Error(`Calibration failed, screenshot recorded as ${fileName}`);
-        } else {
-            throw new Error("Calibration failed, screenshot was not saved.");
-        }
-    }
-    ctx.body = {
-        x: rectangle.x,
-        y: rectangle.y
-    };
+
+    // execute the calibration in a different process (because processing images blocks the
+    // js process, and this could impact other virtual machines managed by this vbox-robot)
+    ctx.body = yield executeTask(task);
 });
