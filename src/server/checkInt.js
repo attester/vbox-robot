@@ -16,7 +16,7 @@
 
 module.exports = function (value) {
     const res = Math.round(value);
-    if (isNaN(res)) {
+    if (typeof value != "number" || isNaN(res)) {
         throw new Error(`Invalid number: ${value}`);
     }
     return res;
