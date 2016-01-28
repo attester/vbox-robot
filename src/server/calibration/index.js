@@ -14,6 +14,7 @@
  */
 "use strict";
 
+const wait = require("../../wait");
 const path = require("path");
 const child_process = require("child_process");
 const co = require("co");
@@ -105,7 +106,8 @@ module.exports = co.wrap(function *(ctx){
     // resets the mouse:
     vm.mouseButtonsState = 0;
     yield vm.mouseMove(0, 0);
-
+    // wait for the mouse to really be out of the way:
+    yield wait(100);
     // execute the calibration in a different process (because processing images blocks the
     // js process, and this could impact other virtual machines managed by this vbox-robot)
     ctx.body = yield executeTask(task);
