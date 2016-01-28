@@ -22,31 +22,32 @@ Usage:
   vbox-robot [options]
 
 Accepted options:
-  --host <hostname>                   Host to bind the web server to.
-  --port <port>                       Port to bind the web server to.
-  --username <username>               Username to protect the root URL (with basic authentication).
-  --password <password>               Password to protect the root URL (with basic authentication).
-  --vboxwebsrv <vboxwebsrv>           URL of the VBoxWebSrv server.
-  --vboxusername <username>           Username to connect to the VBoxWebSrv server.
-  --vboxpassword <password>           Password to connect to the VBoxWebSrv server.
-  --help                              Displays this help message and exits.
-  --version                           Displays the version number and exits.
+  --host <hostname>                       Host to bind the web server to.
+  --port <port>                           Port to bind the web server to.
+  --username <username>                   Username to protect the root URL (with basic authentication).
+  --password <password>                   Password to protect the root URL (with basic authentication).
+  --vboxwebsrv <vboxwebsrv>               URL of the VBoxWebSrv server.
+  --vboxusername <username>               Username to connect to the VBoxWebSrv server.
+  --vboxpassword <password>               Password to connect to the VBoxWebSrv server.
+  --failed-calibrations-folder <folder>   Specifies a folder where failed calibration screenshots will be saved.
+  --help                                  Displays this help message and exits.
+  --version                               Displays the version number and exits.
 
 The following options can be used and repeated several times (with a different <id>) to clone and start
 some virtual machines right from the beginning:
 
-  --vm.<id>.clone <vmName>            Clone <vmName>, starts it and allows accessing it through the /vm/<id> path.
-  --vm.<id>.snapshot <snapshotName>   Specifies the snapshot to use when cloning the virtual machine.
-  --vm.<id>.name <cloneName>          Specifies the name of the clone (automatically generated if omitted).
+  --vm.<id>.clone <vmName>                Clone <vmName>, starts it and allows accessing it through the /vm/<id> path.
+  --vm.<id>.snapshot <snapshotName>       Specifies the snapshot to use when cloning the virtual machine.
+  --vm.<id>.name <cloneName>              Specifies the name of the clone (automatically generated if omitted).
 
 The following options can be used and repeated several times (with a different <id>) to connect to already
 running virtual machines right from the beginning:
 
-  --vm.<id>.connect <vmName>          Connect to the already running <vmName>, allowing accessing it through the /vm/<id> path.
+  --vm.<id>.connect <vmName>              Connect to the already running <vmName>, allowing accessing it through the /vm/<id> path.
 `;
 
 const minimistOptions = {
-    string: ["host", "port", "username", "password", "vboxwebsrv", "vboxusername", "vboxpassword"],
+    string: ["host", "port", "username", "password", "vboxwebsrv", "vboxusername", "vboxpassword", "failed-calibrations-folder"],
     boolean: ["help", "version"]
 };
 
