@@ -20,6 +20,7 @@ const child_process = require("child_process");
 const co = require("co");
 const checkInt = require("../checkInt");
 const createId = require("../createId");
+const closeVM = require("../vmManageRoutes").closeVM;
 
 const processes = [];
 const availableProcesses = [];
@@ -110,5 +111,12 @@ module.exports = co.wrap(function *(ctx){
     yield wait(100);
     // execute the calibration in a different process (because processing images blocks the
     // js process, and this could impact other virtual machines managed by this vbox-robot)
-    ctx.body = yield executeTask(task);
+    try {
+        ctx.body = yield executeTask(task);
+    } catch (e) {
+        if (vm.closeOnFailedCalibration) {
+            yield closeVM(ctx.application, ctx.vmId, vm);
+        }
+        throw e;
+    }
 });

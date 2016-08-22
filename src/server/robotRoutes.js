@@ -151,12 +151,13 @@ const keyboardSendScancodes = co.wrap(function * (ctx) {
     yield ctx.vm.vboxKeyboard.putScancodes(scancodes);
 });
 
-const vmParam = function (vm, ctx, next) {
-    ctx.vm = ctx.application.vms[vm];
+const vmParam = function (vmId, ctx, next) {
+    ctx.vm = ctx.application.vms[vmId];
     if (!ctx.vm) {
         ctx.status = 404;
         return;
     }
+    ctx.vmId = vmId;
     return next();
 };
 

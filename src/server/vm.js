@@ -31,6 +31,7 @@ const VM = module.exports = function () {
     this.vboxDisplay = null;
     this.vboxGuest = null;
     this.mouseButtonsState = 0;
+    this.closeOnFailedCalibration = false;
 };
 
 const dataSize = 64 * 1024;
@@ -78,6 +79,15 @@ VM.prototype.fillConsole = co.wrap(function *() {
     this.vboxMouse = yield vboxMouse;
     this.vboxDisplay = yield vboxDisplay;
     this.vboxGuest = yield vboxGuest;
+});
+
+VM.prototype.setParams = co.wrap(function *(params) {
+    if (!params) {
+        return;
+    }
+    if (params.closeOnFailedCalibration) {
+        this.closeOnFailedCalibration = true;
+    }
 });
 
 VM.prototype.unlock = co.wrap(function *() {

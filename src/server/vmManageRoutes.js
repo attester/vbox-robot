@@ -22,7 +22,7 @@ const url = require("url");
 const parse = require("co-body");
 const basicAuth = require("basic-auth");
 
-const addRunningVM = co.wrap(function *(application, vmNameOrId) {
+const addRunningVM = co.wrap(function *(application, vmNameOrId, params) {
     const vboxClient = application.vboxClient;
     const vm = new VM();
     try {
@@ -34,6 +34,7 @@ const addRunningVM = co.wrap(function *(application, vmNameOrId) {
         vm.vboxSession = yield vboxClient.getSessionObject(application.vboxObject);
         yield vm.vboxMachine.lockMachine(vm.vboxSession, "Shared");
         yield vm.fillConsole();
+        yield vm.setParams(params);
     } catch (e) {
         yield vm.close();
         throw e;
@@ -41,7 +42,7 @@ const addRunningVM = co.wrap(function *(application, vmNameOrId) {
     return vm;
 });
 
-const cloneAndRunVM = co.wrap(function *(application, vmNameOrId, clonedName, snapshot) {
+const cloneAndRunVM = co.wrap(function *(application, vmNameOrId, clonedName, snapshot, params) {
     const vboxClient = application.vboxClient;
     const vm = new VM();
     vm.close = vm.stopAndDelete;
@@ -59,6 +60,7 @@ const cloneAndRunVM = co.wrap(function *(application, vmNameOrId, clonedName, sn
         const startProgress = yield vm.vboxMachine.launchVMProcess(vm.vboxSession, "headless");
         yield startProgress.waitForCompletion(-1);
         yield vm.fillConsole(application, vm);
+        yield vm.setParams(params);
     } catch (e) {
         yield vm.close();
         throw e;
@@ -71,12 +73,15 @@ const addVM = co.wrap(function * (ctx) {
     const vms = application.vms;
     const vmId = createId();
     const body = yield parse.json(ctx);
+    const params = {
+        closeOnFailedCalibration: body.closeOnFailedCalibration
+    };
     if (body.clone) {
         console.log(`/vm/${vmId}/clone ${body.clone} (${body.snapshot || "snapshot not specified"})`);
-        vms[vmId] = yield cloneAndRunVM(application, body.clone, vmId, body.snapshot);
+        vms[vmId] = yield cloneAndRunVM(application, body.clone, vmId, body.snapshot, params);
     } else if (body.connect) {
         console.log(`/vm/${vmId}/connect ${body.connect}`);
-        vms[vmId] = yield addRunningVM(application, body.connect);
+        vms[vmId] = yield addRunningVM(application, body.connect, params);
     }
     ctx.status = 200;
     const baseURL = url.format({
@@ -91,19 +96,25 @@ const addVM = co.wrap(function * (ctx) {
     };
 });
 
+const closeVM = co.wrap(function * (application, vmId, vm) {
+    const vms = application.vms;
+    if (vm === vms[vmId]) {
+        delete vms[vmId];
+        yield vm.close();
+    }
+});
+
 const removeVM = co.wrap(function * (ctx) {
-    const vm = ctx.vmRef;
+    const vm = ctx.vm;
     if (vm) {
         console.log(ctx.path);
-        const application = ctx.application;
-        delete application.vms[ctx.vmId];
-        yield vm.close();
+        yield closeVM(ctx.application, ctx.vmId, vm);
         ctx.status = 200;
     }
 });
 
 const runCommandInVM = co.wrap(function * (ctx) {
-    const vm = ctx.vmRef;
+    const vm = ctx.vm;
     if (!vm) {
         ctx.status = 404;
         return;
@@ -114,9 +125,9 @@ const runCommandInVM = co.wrap(function * (ctx) {
     ctx.status = 200;
 });
 
-const vmParam = function (vm, ctx, next) {
-    ctx.vmId = vm;
-    ctx.vmRef = ctx.application.vms[vm];
+const vmParam = function (vmId, ctx, next) {
+    ctx.vmId = vmId;
+    ctx.vm = ctx.application.vms[vmId];
     return next();
 };
 
@@ -158,3 +169,4 @@ module.exports = function () {
 
 module.exports.addRunningVM = addRunningVM;
 module.exports.cloneAndRunVM = cloneAndRunVM;
+module.exports.closeVM = closeVM;
