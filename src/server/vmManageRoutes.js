@@ -71,8 +71,8 @@ const cloneAndRunVM = co.wrap(function *(application, vmNameOrId, clonedName, sn
 const addVM = co.wrap(function * (ctx) {
     const application = ctx.application;
     const vms = application.vms;
-    const vmId = createId();
     const body = yield parse.json(ctx);
+    const vmId = body.name ? body.name : createId();
     const params = {
         closeOnFailedCalibration: body.closeOnFailedCalibration
     };
