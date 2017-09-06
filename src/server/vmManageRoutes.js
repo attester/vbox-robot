@@ -71,23 +71,23 @@ const cloneAndRunVM = co.wrap(function *(application, vmNameOrId, clonedName, sn
 const addVM = co.wrap(function * (ctx) {
     const application = ctx.application;
     const vms = application.vms;
-    const vmId = createId();
     const body = yield parse.json(ctx);
+    const vmId = body.name ? body.name : createId();
     const params = {
         closeOnFailedCalibration: body.closeOnFailedCalibration
     };
     if (body.clone) {
-        console.log(`/vm/${vmId}/clone ${body.clone} (${body.snapshot || "snapshot not specified"})`);
+        console.log(`/vm/${encodeURIComponent(vmId)}/clone ${body.clone} (${body.snapshot || "snapshot not specified"})`);
         vms[vmId] = yield cloneAndRunVM(application, body.clone, vmId, body.snapshot, params);
     } else if (body.connect) {
-        console.log(`/vm/${vmId}/connect ${body.connect}`);
+        console.log(`/vm/${encodeURIComponent(vmId)}/connect ${body.connect}`);
         vms[vmId] = yield addRunningVM(application, body.connect, params);
     }
     ctx.status = 200;
     const baseURL = url.format({
         protocol: ctx.protocol,
         host: ctx.host,
-        pathname: `/vm/${vmId}`
+        pathname: `/vm/${encodeURIComponent(vmId)}`
     });
     ctx.body = {
         robotjs: `${baseURL}/robot.js`,
