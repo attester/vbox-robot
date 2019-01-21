@@ -16,7 +16,7 @@
 
 const createId = require("./createId");
 const koaRouter = require("koa-router");
-const VM = require("./VM");
+const VM = require("./vm");
 const co = require("co");
 const url = require("url");
 const parse = require("co-body");

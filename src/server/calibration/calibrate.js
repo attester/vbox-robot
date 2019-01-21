@@ -19,7 +19,7 @@ const promisify = require("pify");
 const writeFile = promisify(require("fs").writeFile);
 const PNG = require("pngjs").PNG;
 const findRectangle = require("./findRectangle");
-const getVboxDisplay = require("./getVboxDisplay");
+const getVboxDisplay = require("./getVBoxDisplay");
 
 module.exports = co.wrap(function *(task){
     const vboxDisplay = yield getVboxDisplay(task.vboxServer, task.vboxDisplay);
