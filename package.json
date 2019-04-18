@@ -25,14 +25,13 @@
     "minimist": "^1.2.0",
     "pify": "^2.3.0",
     "pngjs": "^2.1.0",
-    "soap": "^0.11.0",
-    "virtualbox-soap": "^1.0.0"
+    "virtualbox-soap": "^2.0.0"
   },
   "engines": {
     "node": ">=4.2.1"
   },
   "scripts": {
-    "prepublish": "webpack",
+    "prepare": "webpack",
     "lint": "eslint src",
     "test": "npm run lint"
   },

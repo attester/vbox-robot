@@ -61,7 +61,7 @@ const appKeepAlive = co.wrap(function * (application) {
 
 const appVirtualBoxConnect = co.wrap(function * (application) {
     const config = application.config;
-    const vboxClient = application.vboxClient = yield vbox(config.vboxwebsrv);
+    const vboxClient = application.vboxClient = yield vbox.connect(config.vboxwebsrv);
     console.log("Connecting to Virtual Box server...");
     application.vboxObject = yield vboxClient.logon({
         username: config.vboxusername,

@@ -20,7 +20,7 @@ const webSessionManagers = Object.create(null);
 module.exports = co.wrap(function * (vboxServer, vboxDisplay) {
     let webSessionMgr = webSessionManagers[vboxServer];
     if (!webSessionMgr) {
-        webSessionMgr = webSessionManagers[vboxServer] = yield vbox(vboxServer);
+        webSessionMgr = webSessionManagers[vboxServer] = yield vbox.connect(vboxServer);
     }
     return new vbox.IDisplay(webSessionMgr.__client, vboxDisplay);
 });
