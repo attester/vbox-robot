@@ -18,7 +18,7 @@ const co = require("co");
 const promisify = require("pify");
 const writeFile = promisify(require("fs").writeFile);
 const PNG = require("pngjs").PNG;
-const findRectangle = require("./findRectangle");
+const findViewport = require("./findViewport");
 const getVboxDisplay = require("./getVBoxDisplay");
 
 module.exports = co.wrap(function *(task){
@@ -27,20 +27,15 @@ module.exports = co.wrap(function *(task){
     const screenShot = yield vboxDisplay.takeScreenShotToArray(0, resolution.width, resolution.height, "PNG");
     const image = new PNG();
     const parseImage = promisify(image.parse.bind(image));
-    const imageBuffer = new Buffer(screenShot, "base64");
+    const imageBuffer = Buffer.from(screenShot, "base64");
     yield parseImage(imageBuffer);
-    const rectangle = findRectangle(image, [255,0,0,255], task.expectedWidth, task.expectedHeight, 50);
-    if (!rectangle) {
+    try {
+        return findViewport(image);
+    } catch (error) {
         const fileName = task.failedCalibrationFileName;
         if (fileName) {
             writeFile(fileName, imageBuffer); // no yield to speed up the response
-            throw new Error(`Calibration failed, screenshot recorded as ${fileName}`);
-        } else {
-            throw new Error("Calibration failed, screenshot was not saved.");
         }
+        throw new Error(`Calibration failed, ${fileName ? `screenshot recorded as ${fileName}` : `screenshot was not saved` }.\n${error}`);
     }
-    return {
-        x: rectangle.x,
-        y: rectangle.y
-    };
 });

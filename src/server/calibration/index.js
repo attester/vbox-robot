@@ -18,7 +18,6 @@ const wait = require("../../wait");
 const path = require("path");
 const child_process = require("child_process");
 const co = require("co");
-const checkInt = require("../checkInt");
 const createId = require("../createId");
 const closeVM = require("../vmManageRoutes").closeVM;
 
@@ -97,8 +96,6 @@ module.exports = co.wrap(function *(ctx){
     const screenshotsFolder = config["failed-calibrations-folder"];
     const vm = ctx.vm;
     const task = {
-        expectedWidth: checkInt(ctx.data[0]),
-        expectedHeight: checkInt(ctx.data[1]),
         failedCalibrationFileName: screenshotsFolder ? path.join(screenshotsFolder, `${createId()}.png`) : null,
         vboxServer: config.vboxwebsrv,
         vboxDisplay: vm.vboxDisplay.__object
@@ -112,7 +109,18 @@ module.exports = co.wrap(function *(ctx){
     // execute the calibration in a different process (because processing images blocks the
     // js process, and this could impact other virtual machines managed by this vbox-robot)
     try {
-        ctx.body = yield executeTask(task);
+        const result = yield executeTask(task);
+        // click on the QR code to make sure the window is focused:
+        yield vm.mouseMove(result.qrCodeX, result.qrCodeY);
+        yield wait(100);
+        yield vm.vboxMouse.putMouseEvent(0, 0, 0, 0, 1);
+        yield wait(50);
+        yield vm.vboxMouse.putMouseEvent(0, 0, 0, 0, 0);
+        yield wait(100);
+        // after clicking, move the mouse back to 0, 0
+        yield vm.mouseMove(0, 0);
+        yield wait(100);
+        ctx.body = result;
     } catch (e) {
         if (vm.closeOnFailedCalibration) {
             yield closeVM(ctx.application, ctx.vmId, vm);
