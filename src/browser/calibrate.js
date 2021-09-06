@@ -15,23 +15,55 @@
 
 "use strict";
 
+var QRCode = require("qrcode/lib/core/qrcode");
+var Utils = require("qrcode/lib/renderer/utils");
 var request = require("./request");
+
+var qrCodePrefix = "vbox-robot://";
+var outerMargin = 10;
+var innerMargin = 50;
 
 module.exports = function (callback) {
     var div = document.createElement("div");
-    var border = 30;
-    div.style.cssText = "display:block;position:absolute;background-color:rgb(255, 0, 0);border:" + border
-            + "px solid rgb(100, 100, 100);left:0px;top:0px;right:0px;bottom:0px;cursor:none;z-index:999999;";
+    div.style.cssText = "display:block;position:absolute;background-color:white;left:0px;top:0px;right:0px;bottom:0px;cursor:none;z-index:999999;";
     document.body.appendChild(div);
+    var width = div.offsetWidth;
+    var height = div.offsetHeight;
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.cssText = "display:block;position:absolute;left:0px;top:0px;";
+    div.appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+    var y = outerMargin;
+    var qrSize = 0;
+    var opts = {
+        errorCorrectionLevel: "H",
+        margin: 0,
+        scale: 1
+    };
+    while (y + qrSize + outerMargin < height) {
+        var x = outerMargin;
+        while (x + qrSize + outerMargin < width) {
+            var qrData = QRCode.create(qrCodePrefix + x + "/" + y, opts);
+            qrSize = Utils.getImageWidth(qrData.modules.size, opts);
+            var image = ctx.createImageData(qrSize, qrSize);
+            Utils.qrToImageData(image.data, qrData, Utils.getOptions(opts));
+            ctx.putImageData(image, x, y);
+            x += qrSize + innerMargin;
+        }
+        y += qrSize + innerMargin;
+    }
+
     // wait some time for the browser to display the element
     setTimeout(function () {
-        request("calibrate", [div.offsetWidth - 2 * border, div.offsetHeight - 2 * border], function (response) {
+        request("calibrate", [], function (response) {
             div.parentNode.removeChild(div);
             if (response.success) {
                 var result = response.result;
                 response.result = {
-                    x : result.x - border,
-                    y : result.y - border
+                    x : result.x,
+                    y : result.y
                 };
             }
             callback(response);

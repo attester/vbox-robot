@@ -33,7 +33,6 @@ createFunction("smoothMouseMove", 5);
 createFunction("mousePress", 1);
 createFunction("mouseRelease", 1);
 createFunction("mouseWheel", 1);
-createFunction("calibrate", 2);
 createFunction("keyboardSendScancodes", 1);
 
 exports.getOffset = function (callback) {
