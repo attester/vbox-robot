@@ -1,6 +1,6 @@
 {
   "name": "vbox-robot",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Tool allowing JavaScripts scripts running in a browser to send keyboard and mouse events to the Virtual Box machine they run in, especially for automated tests.",
   "repository": {
     "type": "git",
