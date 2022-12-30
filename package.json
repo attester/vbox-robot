@@ -39,6 +39,6 @@
   "devDependencies": {
     "eslint": "^1.10.3",
     "qrcode": "^1.4.4",
-    "webpack": "^1.12.9"
+    "webpack": "^5.75.0"
   }
 }
